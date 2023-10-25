@@ -4,13 +4,10 @@ from PyQt5.uic import loadUiType
 from pandas import read_csv
 import sys
 from PyQt5.QtGui import QIntValidator
-from PyQt5 import Qt
-
-# from PyQt5.QtWidgets import QFileDialog, QMessageBox, QApplication, QColorDialog
-# from pyqtgraph.Qt import QtCore, QtGui
 import numpy as np
+from os import path
+
 # from random import choice
-from os import path  # listdir, remove
 
 FORM_CLASS, _ = loadUiType(path.join(path.dirname(__file__), "mainWindow.ui"))
 
@@ -21,16 +18,6 @@ def plot(t, y, title, graph, p='b'):
     plotted_curve = pg.PlotCurveItem(t, y, pen=p, name=title)
     graph.addItem(plotted_curve)
     # plotted_curve.setData(t, y, pen='b', name=title)
-
-
-def calculate_max_frequency(signal):
-    fft = np.fft.fft(signal)
-    frequency = np.fft.fftfreq(len(signal))
-    magnitude = np.abs(fft)
-    # max_magnitude = np.max(magnitude)
-    max_frequency_index = np.argmax(magnitude)
-    max_frequency = np.abs(frequency[max_frequency_index])
-    return round(max_frequency * 10**6)
 
 
 class MainApp(QMainWindow, FORM_CLASS):
@@ -47,13 +34,11 @@ class MainApp(QMainWindow, FORM_CLASS):
         self.signal_title = None
         self.signal_data_t = None
         self.signal_data_y = None
-        self.from_csv = False
-        self.sample_freq = 0
-        self.csv_freq = 0
         self.mixer_signals = {}
         self.handle_buttons()
         self.is_noisy = False
         self.noisy_signal = None
+        self.max_freq = None
 
         # allow only integers in lineEdits
         only_int = QIntValidator()
@@ -82,7 +67,6 @@ class MainApp(QMainWindow, FORM_CLASS):
         self.noiseBtn.setEnabled(False)
         self.noiseSlider.setEnabled(False)
 
-
     def import_from_csv(self):
         file_path, _ = QFileDialog.getOpenFileName(self, "open csv file", "data/", "CSV Files (*.csv)")
         if file_path != '':
@@ -95,8 +79,10 @@ class MainApp(QMainWindow, FORM_CLASS):
             # plot(self.signal_data_t, self.signal_data_y, self.signal_title, self.samplingGraph)
             # plot(self.signal_data_t, self.signal_data_y, self.signal_title, self.samplingGraph)
 
-            self.from_csv = True
-            self.csv_freq = 125
+            i = 0
+            while self.signal_data_t[i] < 1:
+                i += 1
+            self.max_freq = i/2
             self.noiseBtn.setEnabled(True)
 
         else:
@@ -105,7 +91,10 @@ class MainApp(QMainWindow, FORM_CLASS):
     def import_from_mixer(self):
         self.signal_data_t = np.linspace(0, 1, 1000)
         self.signal_data_y = np.zeros(1000)
+        self.max_freq = 0
         for signal in self.mixer_signals:
+            if self.mixer_signals[signal][2] > self.max_freq:
+                self.max_freq = self.mixer_signals[signal][2]
             self.signal_data_y += self.mixer_signals[signal][0] * np.sin(
                 2 * np.pi * self.mixer_signals[signal][2] * self.signal_data_t + self.mixer_signals[signal][
                     1] / 180 * np.pi)
@@ -113,7 +102,6 @@ class MainApp(QMainWindow, FORM_CLASS):
         self.mixer_signals.clear()
         self.comboBoxMixer.clear()
         self.mixerGraph.clear()
-        self.from_csv = False
         self.noiseBtn.setEnabled(True)
 
     def add_to_mixer(self):
@@ -154,13 +142,7 @@ class MainApp(QMainWindow, FORM_CLASS):
         plot(t, y, "Mixer", self.mixerGraph)
 
     def sample_signal(self):
-        if self.from_csv:
-            self.sample_freq = self.csv_freq
-        else:
-            max_frequency = calculate_max_frequency(self.signal_data_y)
-            sampling_frequency = 2 * max_frequency
-            print(f"Maximum Frequency: {max_frequency} Hz")
-            print(f"Sampling Frequency (Nyquist Theorem): {sampling_frequency} Hz")
+        print(self.max_freq)
 
     def add_noise(self, snr):
         self.samplingGraph.clear()
@@ -198,6 +180,7 @@ class MainApp(QMainWindow, FORM_CLASS):
         #         use noisy signal data
         #     else:
         #         use original signal data
+
 
 def main():
     app = QApplication(sys.argv)
