@@ -112,7 +112,7 @@ class MainApp(QMainWindow, FORM_CLASS):
         self.removeSignalMixerBtn.clicked.connect(self.remove_from_mixer)
         self.noiseSlider.valueChanged.connect(self.update_snr)
         self.noiseBtn.setCheckable(True)
-        self.noiseBtn.toggled.connect(self.is_noisy)
+        self.noiseBtn.toggled.connect(self.check_noisy)
         self.noiseBtn.setEnabled(False)
         self.noiseSlider.setEnabled(False)
         self.samplingFrequencySlider.setEnabled(False)
@@ -139,6 +139,7 @@ class MainApp(QMainWindow, FORM_CLASS):
             self.samplingFrequencySlider.setTickPosition(QSlider.TicksAbove)
             self.frequency_change()
             self.graphs_plot(self.signal_data_t, self.signal_data_y)
+            self.check_noisy()
         else:
             QMessageBox.warning(self, "Warning", "No file selected")
 
@@ -166,6 +167,7 @@ class MainApp(QMainWindow, FORM_CLASS):
         self.comboBoxMixer.clear()
         self.mixer_signal.setData()
         self.noiseBtn.setEnabled(True)
+        self.check_noisy()
 
     def add_to_mixer(self):
         if (self.lineEditMagnitude.text() != '' and self.lineEditPhase.text() != '' and
@@ -219,7 +221,7 @@ class MainApp(QMainWindow, FORM_CLASS):
             self.noiseLabel.setText(f'SNR: {snr} dB')
             self.add_noise(snr)
 
-    def is_noisy(self):
+    def check_noisy(self):
         if self.noiseBtn.isChecked():
             self.noiseSlider.setEnabled(True)
             self.is_noisy = True
@@ -229,12 +231,6 @@ class MainApp(QMainWindow, FORM_CLASS):
             self.graphs_plot(self.signal_data_t, self.signal_data_y)
             self.noiseSlider.setEnabled(False)
             self.is_noisy = False
-
-        # def sample_signal(self):
-        #     if self.is_noisy:
-        #         use noisy signal data
-        #     else:
-        #         use original signal data
 
     def frequency_change(self):
         frequency_type = self.frequencyComboBox.currentIndex()
