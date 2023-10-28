@@ -1260,7 +1260,6 @@ QDateEdit::down-arrow:focus
                <property name="font">
                 <font>
                  <pointsize>10</pointsize>
-                 <weight>75</weight>
                  <bold>true</bold>
                 </font>
                </property>
@@ -1291,20 +1290,6 @@ QDateEdit::down-arrow:focus
             <layout class="QHBoxLayout" name="horizontalLayout_20"/>
            </item>
            <item>
-            <widget class="QPushButton" name="showSampleFreqBtn">
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-               <weight>75</weight>
-               <bold>true</bold>
-              </font>
-             </property>
-             <property name="text">
-              <string>Show Fs</string>
-             </property>
-            </widget>
-           </item>
-           <item>
             <spacer name="verticalSpacer_6">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
@@ -1328,7 +1313,6 @@ QDateEdit::down-arrow:focus
              <property name="font">
               <font>
                <pointsize>13</pointsize>
-               <weight>75</weight>
                <bold>true</bold>
               </font>
              </property>
@@ -1341,7 +1325,7 @@ QDateEdit::down-arrow:focus
             </widget>
            </item>
            <item>
-            <widget class="QComboBox" name="comboBox_3">
+            <widget class="QComboBox" name="frequencyComboBox">
              <property name="minimumSize">
               <size>
                <width>87</width>
@@ -1367,7 +1351,7 @@ QDateEdit::down-arrow:focus
             </widget>
            </item>
            <item>
-            <widget class="QSlider" name="horizontalSlider_3">
+            <widget class="QSlider" name="samplingFrequencySlider">
              <property name="maximumSize">
               <size>
                <width>240</width>
@@ -1380,9 +1364,9 @@ QDateEdit::down-arrow:focus
             </widget>
            </item>
            <item>
-            <widget class="QLabel" name="label_3">
+            <widget class="QLabel" name="frequencyLabel">
              <property name="text">
-              <string>Frequency : </string>
+              <string/>
              </property>
             </widget>
            </item>
@@ -1431,7 +1415,6 @@ QDateEdit::down-arrow:focus
              <property name="font">
               <font>
                <pointsize>13</pointsize>
-               <weight>75</weight>
                <bold>true</bold>
               </font>
              </property>
@@ -1448,7 +1431,6 @@ QDateEdit::down-arrow:focus
              <property name="font">
               <font>
                <pointsize>10</pointsize>
-               <weight>75</weight>
                <bold>true</bold>
               </font>
              </property>
@@ -1541,7 +1523,6 @@ QDateEdit::down-arrow:focus
                 <property name="font">
                  <font>
                   <pointsize>9</pointsize>
-                  <weight>75</weight>
                   <bold>true</bold>
                  </font>
                 </property>
@@ -1584,7 +1565,6 @@ QDateEdit::down-arrow:focus
                 <property name="font">
                  <font>
                   <pointsize>9</pointsize>
-                  <weight>75</weight>
                   <bold>true</bold>
                  </font>
                 </property>
@@ -1634,7 +1614,6 @@ QDateEdit::down-arrow:focus
                 <property name="font">
                  <font>
                   <pointsize>9</pointsize>
-                  <weight>75</weight>
                   <bold>true</bold>
                  </font>
                 </property>
@@ -1685,7 +1664,6 @@ QDateEdit::down-arrow:focus
                  <property name="font">
                   <font>
                    <pointsize>13</pointsize>
-                   <weight>75</weight>
                    <bold>true</bold>
                   </font>
                  </property>
@@ -1717,7 +1695,6 @@ QDateEdit::down-arrow:focus
                <property name="font">
                 <font>
                  <pointsize>10</pointsize>
-                 <weight>75</weight>
                  <bold>true</bold>
                 </font>
                </property>
@@ -1772,7 +1749,6 @@ QDateEdit::down-arrow:focus
                <property name="font">
                 <font>
                  <pointsize>10</pointsize>
-                 <weight>75</weight>
                  <bold>true</bold>
                 </font>
                </property>
@@ -1827,7 +1803,6 @@ QDateEdit::down-arrow:focus
                <property name="font">
                 <font>
                  <pointsize>10</pointsize>
-                 <weight>75</weight>
                  <bold>true</bold>
                 </font>
                </property>
@@ -1882,7 +1857,6 @@ QDateEdit::down-arrow:focus
                <property name="font">
                 <font>
                  <pointsize>10</pointsize>
-                 <weight>75</weight>
                  <bold>true</bold>
                 </font>
                </property>
@@ -1953,7 +1927,6 @@ QDateEdit::down-arrow:focus
                <property name="font">
                 <font>
                  <pointsize>10</pointsize>
-                 <weight>75</weight>
                  <bold>true</bold>
                 </font>
                </property>
@@ -2002,7 +1975,6 @@ QDateEdit::down-arrow:focus
                <property name="font">
                 <font>
                  <pointsize>13</pointsize>
-                 <weight>75</weight>
                  <bold>true</bold>
                 </font>
                </property>
@@ -2054,7 +2026,6 @@ QDateEdit::down-arrow:focus
                 <property name="font">
                  <font>
                   <pointsize>9</pointsize>
-                  <weight>75</weight>
                   <bold>true</bold>
                  </font>
                 </property>
@@ -2119,7 +2090,6 @@ QDateEdit::down-arrow:focus
                <property name="font">
                 <font>
                  <pointsize>10</pointsize>
-                 <weight>75</weight>
                  <bold>true</bold>
                 </font>
                </property>
@@ -2152,7 +2122,6 @@ QDateEdit::down-arrow:focus
                <property name="font">
                 <font>
                  <pointsize>10</pointsize>
-                 <weight>75</weight>
                  <bold>true</bold>
                 </font>
                </property>
