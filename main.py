@@ -203,7 +203,7 @@ class MainApp(QMainWindow, FORM_CLASS):
         for signal in self.mixer_signals:
             y += self.mixer_signals[signal][0] * np.sin(
                 2 * np.pi * self.mixer_signals[signal][2] * t + self.mixer_signals[signal][1] / 180 * np.pi)
-        self.mixer_signal.setData(t, y, title="Mixer",pen='b')
+        self.mixer_signal.setData(t, y, title="Mixer", pen='b')
 
     def add_noise(self, snr):
         power = self.signal_data_y ** 2
