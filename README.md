@@ -1,4 +1,4 @@
-# Digital Signal Processing Project
+# Sample Wizard
 
 This project is a digital signal processing application that allows users to sample and recover input signals, load and compose signals, add noise, and visualize different aspects of signal processing. The application includes the following features:
 
