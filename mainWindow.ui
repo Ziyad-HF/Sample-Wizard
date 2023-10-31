@@ -2098,6 +2098,31 @@ QDateEdit::down-arrow:focus
                </property>
               </widget>
              </item>
+             <item>
+              <widget class="QPushButton" name="clearBtn">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>40</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>300</width>
+                 <height>40</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <pointsize>10</pointsize>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Clear graph</string>
+               </property>
+              </widget>
+             </item>
             </layout>
            </item>
            <item>

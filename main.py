@@ -57,7 +57,7 @@ class MainApp(QMainWindow, FORM_CLASS):
         self.is_noisy = False
         self.noisy_signal = None
         self.max_freq = None
-
+        self.sf_mixer = False
         self.original_signal = graph_setup(self.samplingGraph)
         self.recovered_signal = graph_setup(self.recoveryGraph)
         self.diff_signal = graph_setup(self.diffGraph)
@@ -87,17 +87,35 @@ class MainApp(QMainWindow, FORM_CLASS):
 
     def graphs_plot(self, t, y, p="b"):
         if self.samplingFrequencySlider.value() != 0:
-            samples_t, samples_y = sampling(t, y, self.samplingFrequencySlider.value())
+            # get samples point
+            if self.sf_mixer:
+                number_of_samples = int(self.samplingFrequencySlider.value() * t[-1])
+                samples_t = np.arange(0, t[-1], 1 / self.samplingFrequencySlider.value())
+                samples_y = np.zeros(number_of_samples)
+                for signal in self.mixer_signals:
+                    samples_y += self.mixer_signals[signal][0] * np.cos(
+                        2 * np.pi * self.mixer_signals[signal][2] * samples_t + self.mixer_signals[signal][
+                            1] / 180 * np.pi)
+            else:
+                samples_t, samples_y = sampling(t, y, self.samplingFrequencySlider.value())
+            # get recover signal point
             recovered_t, recovered_y = recovery(samples_y, samples_t, self.signal_data_t[-1])
-            difference = np.subtract(y, recovered_y)
-            self.samplingGraph.setLimits(xMin=min(t) - 0.2, xMax=max(t) + 0.2, yMin=min(y) - 0.2, yMax=max(y) + 0.2)
-            self.recoveryGraph.setLimits(xMin=min(t) - 0.2, xMax=max(t) + 0.2, yMin=min(y) - 0.2, yMax=max(y) + 0.2)
-            self.diffGraph.setLimits(xMin=min(t), xMax=max(t), yMin=2 * min(difference) - 2,
+            # get the difference between the original signal and recovered
+            difference = np.subtract(self.signal_data_y, recovered_y)
+            # set max and min limit for graphs
+            self.samplingGraph.setLimits(xMin=min(t) - 0.5, xMax=max(t) + 0.5, yMin=min(y) - 0.5, yMax=max(y) + 0.5)
+            self.recoveryGraph.setLimits(xMin=min(t) - 0.5, xMax=max(t) + 0.5, yMin=min(y) - 0.5, yMax=max(y) + 0.5)
+            self.diffGraph.setLimits(xMin=min(t) - 0.5, xMax=max(t) + 0.5, yMin=2 * min(difference) - 2,
                                      yMax=2 * max(difference) + 2)
             self.diffGraph.setYRange(min=2 * min(difference) - 0.5, max=2 * max(difference) + 0.5)
+            self.samplingGraph.setYRange(min=2 * min(y) - 0.5, max=2 * max(y) + 1)
+            # draw original signal
             self.original_signal.setData(t, y, pen=p, name=self.signal_title)
+            # draw samples point
             self.sampling_scatter.setData(samples_t, samples_y, pen="black", name="samples", symbol="x")
+            # draw recovered signal
             self.recovered_signal.setData(recovered_t, recovered_y, pen="b", name=f'recovered {self.signal_title}')
+            # draw difference between the two signal
             self.diff_signal.setData(t, difference, pen="r", ame="difference")
         else:
             self.original_signal.setData(t, y, pen=p, name=self.signal_title)
@@ -118,6 +136,23 @@ class MainApp(QMainWindow, FORM_CLASS):
         self.samplingFrequencySlider.setEnabled(False)
         self.frequencyComboBox.currentTextChanged.connect(self.frequency_change)
         self.samplingFrequencySlider.valueChanged.connect(self.frequency_change)
+        self.clearBtn.clicked.connect(self.clear_mixer)
+
+    def clear_mixer(self):
+        self.mixer_signals.clear()
+        self.comboBoxMixer.clear()
+        self.mixer_signal.setData()
+
+    def slider_setup(self):
+        self.noiseBtn.setEnabled(True)
+        self.samplingFrequencySlider.setEnabled(True)
+        self.samplingFrequencySlider.setMinimum(0)
+        self.samplingFrequencySlider.setMaximum(int(self.max_freq * 4))
+        self.samplingFrequencySlider.setSingleStep(5)
+        self.samplingFrequencySlider.setValue(int(self.max_freq * 2))
+        self.samplingFrequencySlider.setTickPosition(QSlider.TicksAbove)
+        self.frequency_change()
+        self.graphs_plot(self.signal_data_t, self.signal_data_y)
 
     def import_from_csv(self):
         file_path, _ = QFileDialog.getOpenFileName(self, "open csv file", "data/", "CSV Files (*.csv)")
@@ -130,56 +165,43 @@ class MainApp(QMainWindow, FORM_CLASS):
             while self.signal_data_t[i] < 1:
                 i += 1
             self.max_freq = i / 2
-            self.noiseBtn.setEnabled(True)
-            self.samplingFrequencySlider.setEnabled(True)
-            self.samplingFrequencySlider.setMinimum(0)
-            self.samplingFrequencySlider.setMaximum(int(self.max_freq * 4))
-            self.samplingFrequencySlider.setSingleStep(5)
-            self.samplingFrequencySlider.setValue(int(self.max_freq * 2))
-            self.samplingFrequencySlider.setTickPosition(QSlider.TicksAbove)
-            self.frequency_change()
-            self.graphs_plot(self.signal_data_t, self.signal_data_y)
+            self.slider_setup()
             self.check_noisy()
+            self.clear_mixer()
+            self.sf_mixer = False
         else:
             QMessageBox.warning(self, "Warning", "No file selected")
 
     def import_from_mixer(self):
-        self.signal_data_t = np.linspace(0, 1, 1001)
+        self.signal_data_t = np.linspace(0, 8, 1001)
         self.signal_data_y = np.zeros(1001)
         self.max_freq = 0
         for signal in self.mixer_signals:
             if self.mixer_signals[signal][2] > self.max_freq:
                 self.max_freq = self.mixer_signals[signal][2]
-            self.signal_data_y += self.mixer_signals[signal][0] * np.sin(
+            self.signal_data_y += self.mixer_signals[signal][0] * np.cos(
                 2 * np.pi * self.mixer_signals[signal][2] * self.signal_data_t + self.mixer_signals[signal][
                     1] / 180 * np.pi)
 
-        self.noiseBtn.setEnabled(True)
-        self.samplingFrequencySlider.setEnabled(True)
-        self.samplingFrequencySlider.setMinimum(0)
-        self.samplingFrequencySlider.setMaximum(int(self.max_freq * 4))
-        self.samplingFrequencySlider.setSingleStep(5)
-        self.samplingFrequencySlider.setValue(int(self.max_freq * 2))
-        self.samplingFrequencySlider.setTickPosition(QSlider.TicksAbove)
-        self.frequency_change()
-        self.graphs_plot(self.signal_data_t, self.signal_data_y)
-        self.mixer_signals.clear()
-        self.comboBoxMixer.clear()
-        self.mixer_signal.setData()
-        self.noiseBtn.setEnabled(True)
+        self.sf_mixer = True
+        self.slider_setup()
         self.check_noisy()
 
     def add_to_mixer(self):
+
         if (self.lineEditMagnitude.text() != '' and self.lineEditPhase.text() != '' and
                 self.lineEditFrequency.text() != '' and self.lineEditTitle.text() != ''):
-            title = self.lineEditTitle.text()
+            magnitude = float(self.lineEditMagnitude.text())
+            frequency = float(self.lineEditFrequency.text())
+            phase = float(self.lineEditPhase.text())
+            title = f'{self.lineEditTitle.text()} ({magnitude}cos({frequency} t + {phase}))'
             while title in self.mixer_signals:
                 title += "_"
             else:
                 self.mixer_signals[title] = [
-                    float(self.lineEditMagnitude.text()),
-                    float(self.lineEditPhase.text()),
-                    float(self.lineEditFrequency.text())
+                    magnitude,
+                    phase,
+                    frequency
                 ]
                 self.comboBoxMixer.addItem(title)
                 self.build_mixer_graph()
@@ -198,10 +220,10 @@ class MainApp(QMainWindow, FORM_CLASS):
             self.mixer_signal.setData()
 
     def build_mixer_graph(self):
-        t = np.linspace(0, 1, 1001)
+        t = np.linspace(0, 8, 1001)
         y = np.zeros(1001)
         for signal in self.mixer_signals:
-            y += self.mixer_signals[signal][0] * np.sin(
+            y += self.mixer_signals[signal][0] * np.cos(
                 2 * np.pi * self.mixer_signals[signal][2] * t + self.mixer_signals[signal][1] / 180 * np.pi)
         self.mixer_signal.setData(t, y, title="Mixer", pen='b')
 
