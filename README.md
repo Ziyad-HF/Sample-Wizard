@@ -44,6 +44,6 @@ This project is a digital signal processing application that allows users to sam
 
 ## Contributors
 
-- [Ziyad ElFayoumy](https://github.com/Zoz-HF)
+- [Ziyad ElFayoumy](https://github.com/Ziyad-HF)
 - [Amgad Atef](https://github.com/amg-eng)
 - [Mahmoud Mohamed](https://github.com/Mahmoudm007)
